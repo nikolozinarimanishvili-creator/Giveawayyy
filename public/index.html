@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>$500 Cash Giveaway</title>
+<style>
+:root {
+  --bg: #0b1726; --surface: #101f32; --surface-2: #142942; --text: #eef3f8; --muted: #8fa3bb;
+  --line: #22374f; --accent: #d6ad42; --accent-text: #19130a; --good: #4fd19a; --bad: #ff8d7d;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f6f3ea; --surface: #ffffff; --surface-2: #fbf8ef; --text: #1c1812; --muted: #6b6354;
+    --line: #e2dac7; --accent: #a97d16; --accent-text: #fffaf0; --good: #0f6b4f; --bad: #a3261f;
+    color-scheme: light;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font-family: "Iowan Old Style", "Georgia", "Times New Roman", serif;
+  line-height: 1.6;
+}
+.sans { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 24px; border-bottom: 1px solid var(--line);
+}
+header .brand { font-family: system-ui, sans-serif; font-weight: 700; letter-spacing: 0.02em; font-size: 14px; color: var(--muted); }
+header a { color: var(--accent); text-decoration: none; font-family: system-ui, sans-serif; font-size: 13px; font-weight: 600; }
+
+main { max-width: 620px; margin: 0 auto; padding: 56px 24px 72px; }
+
+.amount { font-size: clamp(56px, 13vw, 96px); font-weight: 600; line-height: 1; margin: 0 0 6px; color: var(--accent); letter-spacing: -0.01em; }
+.tagline { font-size: clamp(20px, 4vw, 26px); margin: 0 0 24px; }
+p.lede { font-family: system-ui, sans-serif; color: var(--muted); font-size: 16px; max-width: 54ch; margin: 0 0 32px; }
+
+.rules { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 24px 28px; margin: 0 0 32px; font-family: system-ui, sans-serif; }
+.rules h2 { font-family: inherit; font-size: 13px; text-transform: none; letter-spacing: 0.02em; color: var(--muted); margin: 0 0 14px; font-weight: 600; }
+.rules ol { margin: 0; padding-left: 20px; color: var(--text); font-size: 15px; }
+.rules li { margin-bottom: 8px; }
+.rules li:last-child { margin-bottom: 0; }
+
+.why { font-family: system-ui, sans-serif; font-size: 14px; color: var(--muted); border-left: 2px solid var(--line); padding-left: 14px; margin: 0 0 32px; }
+
+label { display: block; font-family: system-ui, sans-serif; font-size: 13px; color: var(--muted); margin: 0 0 6px; }
+input {
+  font: inherit; font-family: system-ui, sans-serif; font-size: 15px;
+  width: 100%; padding: 12px 14px; margin-bottom: 18px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; color: var(--text);
+}
+input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+button {
+  font: inherit; font-family: system-ui, sans-serif; font-weight: 600; font-size: 15px;
+  background: var(--accent); color: var(--accent-text); border: 0; border-radius: 4px;
+  padding: 14px 24px; cursor: pointer; width: 100%;
+}
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+
+.status { font-family: system-ui, sans-serif; font-size: 14px; margin-top: 14px; }
+.status.err { color: var(--bad); }
+.status.ok { color: var(--good); }
+
+#confirm { display: none; text-align: center; padding: 40px 0; }
+#confirm h1 { font-size: 32px; margin: 0 0 12px; }
+#confirm p { font-family: system-ui, sans-serif; color: var(--muted); max-width: 46ch; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="brand">BRIGHT LANE GIVEAWAY</span>
+  <a href="/admin">Admin</a>
+</header>
+
+<main>
+  <div id="entry">
+    <p class="amount">$500</p>
+    <p class="tagline">One winner, picked at random.</p>
+    <p class="lede">Entry is free. One entry per person. The winner is drawn once entries close and contacted by email.</p>
+
+    <div class="rules">
+      <h2>How it works</h2>
+      <ol>
+        <li>Enter your name and email below.</li>
+        <li>Allow location access so we can confirm each entry is a real, unique person and prevent repeat entries.</li>
+        <li>We'll email the winner directly. No purchase necessary.</li>
+      </ol>
+    </div>
+
+    <p class="why">We ask for your location only to catch duplicate or automated entries, so the giveaway stays fair for everyone. It isn't used for anything else and isn't shown publicly.</p>
+
+    <form id="form">
+      <label for="name">Name</label>
+      <input id="name" type="text" maxlength="60" autocomplete="name" required>
+      <label for="email">Email</label>
+      <input id="email" type="email" maxlength="100" autocomplete="email" required>
+      <button id="submit" type="submit">Enter the giveaway</button>
+      <p class="status" id="status" role="status"></p>
+    </form>
+  </div>
+
+  <div id="confirm">
+    <h1>You're entered.</h1>
+    <p>Thanks — we'll email you if you're picked. Good luck!</p>
+  </div>
+</main>
+
+<script>
+(function () {
+  var id = (crypto.randomUUID && crypto.randomUUID()) || String(Date.now()) + Math.random().toString(16).slice(2);
+  var form = document.getElementById('form');
+  var submit = document.getElementById('submit');
+  var status = document.getElementById('status');
+  var entry = null;
+
+  function setStatus(msg, cls) {
+    status.textContent = msg;
+    status.className = 'status' + (cls ? ' ' + cls : '');
+  }
+
+  function send() {
+    entry.id = id;
+    return fetch('/api/visit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(entry)
+    });
+  }
+
+  function locate() {
+    return new Promise(function (resolve) {
+      if (!('geolocation' in navigator)) return resolve({ status: 'unavailable' });
+      navigator.geolocation.getCurrentPosition(
+        function (pos) {
+          var c = pos.coords;
+          resolve({ status: 'granted', lat: c.latitude, lon: c.longitude, accuracy: Math.round(c.accuracy) });
+        },
+        function (e) {
+          resolve({ status: e && e.code === 1 ? 'denied' : 'unavailable' });
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+      );
+    });
+  }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    submit.disabled = true;
+    setStatus('Checking your location…');
+
+    locate().then(function (loc) {
+      entry = Object.assign({
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim()
+      }, loc);
+
+      if (loc.status === 'denied') {
+        setStatus('Location was blocked. We need it to confirm unique entries — please allow it and try again.', 'err');
+        submit.disabled = false;
+        return;
+      }
+      if (loc.status === 'unavailable') {
+        setStatus('We couldn’t get your location, so we can’t confirm a unique entry right now. Please try again.', 'err');
+        submit.disabled = false;
+        return;
+      }
+
+      return send().then(function (r) {
+        if (!r.ok) throw new Error('bad response');
+        document.getElementById('entry').style.display = 'none';
+        document.getElementById('confirm').style.display = 'block';
+      }).catch(function () {
+        setStatus('Something went wrong submitting your entry. Please try again.', 'err');
+        submit.disabled = false;
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

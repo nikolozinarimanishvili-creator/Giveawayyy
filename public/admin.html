@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin: giveaway entries</title>
+<style>
+:root { --bg: #f3f6f4; --surface: #fff; --text: #14211b; --muted: #5b6b63; --line: #d5dfd9; --accent: #0f6b4f; --accent-text: #fff; --bad: #a3261f; color-scheme: light; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0f1613; --surface: #17211c; --text: #e8f0ec; --muted: #93a69c; --line: #2a3a32; --accent: #4fd1a1; --accent-text: #08130e; --bad: #ff8a80; color-scheme: dark; }
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.5; }
+header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px; border-bottom: 1px solid var(--line); }
+h1 { font-size: 20px; margin: 0; }
+.meta { color: var(--muted); font-size: 14px; }
+button { font: inherit; font-weight: 600; background: var(--accent); color: var(--accent-text); border: 0; border-radius: 8px; padding: 8px 14px; cursor: pointer; margin-left: 8px; }
+button.danger { background: transparent; color: var(--bad); border: 1px solid var(--bad); }
+.wrap { padding: 24px; overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 760px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 14px; vertical-align: top; }
+th { color: var(--muted); font-weight: 600; }
+td a { color: var(--accent); }
+.denied, .unavailable { color: var(--bad); }
+.empty { padding: 32px; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Giveaway entries</h1>
+    <div class="meta" id="count">Loading…</div>
+    <div class="meta" id="phone" hidden></div>
+  </div>
+  <div>
+    <button id="refresh" type="button">Refresh</button>
+    <button id="clear" type="button" class="danger">Clear all</button>
+  </div>
+</header>
+<div class="wrap">
+  <table>
+    <thead><tr><th>Time</th><th>Name</th><th>Email</th><th>Status</th><th>Location</th><th>Accuracy</th><th>IP</th><th>Device</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div class="empty" id="empty" hidden>No entries yet.</div>
+</div>
+<script>
+function cell(tr, text) {
+  var td = document.createElement('td');
+  td.textContent = text;
+  tr.appendChild(td);
+  return td;
+}
+function render(list) {
+  var body = document.getElementById('rows');
+  body.textContent = '';
+  document.getElementById('empty').hidden = list.length > 0;
+  var granted = list.filter(function (v) { return v.status === 'granted'; }).length;
+  document.getElementById('count').textContent = list.length + ' entries, ' + granted + ' verified location';
+  list.forEach(function (v) {
+    var tr = document.createElement('tr');
+    cell(tr, new Date(v.time).toLocaleString());
+    cell(tr, v.name || '–');
+    cell(tr, v.email || '–');
+    cell(tr, v.status).className = v.status;
+    var loc = cell(tr, '');
+    if (v.lat !== null && v.lon !== null) {
+      var a = document.createElement('a');
+      a.textContent = v.lat.toFixed(5) + ', ' + v.lon.toFixed(5);
+      a.href = 'https://www.google.com/maps?q=' + v.lat + ',' + v.lon;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      loc.appendChild(a);
+    } else {
+      loc.textContent = '–';
+    }
+    cell(tr, v.accuracy !== null ? Math.round(v.accuracy) + ' m' : '–');
+    cell(tr, v.ip || '–');
+    cell(tr, v.device || '–');
+    body.appendChild(tr);
+  });
+}
+function load() {
+  fetch('/api/visits').then(function (r) { return r.json(); }).then(render)
+    .catch(function () { document.getElementById('count').textContent = 'Couldn’t load visits.'; });
+}
+document.getElementById('refresh').addEventListener('click', load);
+document.getElementById('clear').addEventListener('click', function () {
+  if (confirm('Delete all visit records? This can’t be undone.')) {
+    fetch('/api/visits', { method: 'DELETE' }).then(load);
+  }
+});
+fetch('/api/admin-info').then(function (r) { return r.json(); }).then(function (i) {
+  if (i.phone) {
+    var el = document.getElementById('phone');
+    el.textContent = 'Admin phone: ' + i.phone;
+    el.hidden = false;
+  }
+});
+load();
+setInterval(load, 10000);
+</script>
+</body>
+</html>
